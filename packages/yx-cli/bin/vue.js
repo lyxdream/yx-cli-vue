@@ -1,9 +1,7 @@
-#! /usr/local/bin/node 
+#!/usr/bin/env node
 
-let {a} = require('yx-cli-shared-utils')
-console.log('1111')
-console.log(a)
+// let {a}= require('yx-cli-shared-utils')
+// console.log(a)
 
-// /usr/local/bin/node 
 
 

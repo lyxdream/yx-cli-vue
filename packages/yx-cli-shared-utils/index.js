@@ -1,2 +1,2 @@
 
-exports.a = 'a'
+exports.a = 'yx'

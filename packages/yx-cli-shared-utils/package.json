@@ -6,14 +6,8 @@
   "homepage": "",
   "license": "ISC",
   "main": "lib/yx-cli-shared-utils.js",
-  "directories": {
-    "lib": "lib",
-    "test": "__tests__"
-  },
-  "files": [
-    "lib"
-  ],
-  "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "execa": "^6.1.0"
   }
 }

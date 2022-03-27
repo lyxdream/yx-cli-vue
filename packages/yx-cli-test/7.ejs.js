@@ -13,7 +13,7 @@ console.log(source,'---')
     console.log(_files) //[ 'main.js', 'assets/2.png', 'components/HelloWord.vue' ]
     let files = {};
     for (const rawPath of _files) {
-        debugger
+        // debugger
         const sourcePath = slash(path.resolve(source, rawPath)) //每个文件的绝对路径
         if(isBinaryFileSync(sourcePath)){
             const content = fs.readFileSync(sourcePath)

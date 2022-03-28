@@ -9,8 +9,9 @@ class PromptModuleAPI{
         this.creator.featurePrompt.choices.push(feature)
     }
     injectPrompt(prompt){
-        this.creator.injectedPrompts.choices.push(prompt)
+        this.creator.injectedPrompts.push(prompt)
     }
+
     //选择完之后的回调
     onPromptComplete(cb){
         this.creator.promptCompleteCbs.push(cb)

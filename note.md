@@ -43,7 +43,7 @@ hell1
       } else if (name === '__default_vue_3__') {
         displayName = 'Default (Vue 3)'
       }
-
+      
       return {
         name: `${displayName} (${formatFeatures(preset)})`,
         value: name

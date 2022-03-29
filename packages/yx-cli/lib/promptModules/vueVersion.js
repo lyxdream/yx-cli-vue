@@ -27,7 +27,7 @@ module.exports = cli => {
     })
     //选完提示框的回调
     cli.onPromptComplete((answers, options) => {
-      // console.log(answers, options,'-=====ddanswers, options')
+      //如果是手工配置的话，默认是没有插件的，插件是在不同的promptModules里面通过onPromptComplete添加进去的
       if (answers.vueVersion) { //给版本号赋值
         options.vueVersion = answers.vueVersion
       }

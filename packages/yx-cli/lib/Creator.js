@@ -3,6 +3,7 @@ const inquirer = require('inquirer');
 let {defaults} =  require('./options')
 let PromptModuleAPI = require('./PromptModuleAPI')
 const isManualMode = answers => answers.preset === '__manual__' //是否手动选择特性
+const cloneDeep = require('lodash.clonedeep')
 class Creator{
    constructor(name,context,promptModules){
         this.name = name;
@@ -16,8 +17,32 @@ class Creator{
         promptModules.forEach(m => m(promptAPI))  //调用vueVersion.js里面的函数
    }
    async create(){
+       const {name,context} = this; //name 要创建的项目名 context所在目录
        let preset = await this.promptAndResolvePreset()
        console.log(preset,'---preset')
+       preset = cloneDeep(preset)
+       //@vue/cli-service  核心包，自带webpack得配置，build，serve的命令
+       //@vue/cli-service  非常特殊，它的选项也被称为项目的选项，或者说根选项 rootOptions
+       preset.plugins['@vue/cli-service'] = Object.assign({projectName:name},preset)
+       console.log(`✨  Creating project in ${chalk.yellow(context)}.`)
+       const pkg = {  //将要生成的package.json内容
+           name,
+           version: '0.1.0',
+           private:true,
+           devDependencies: {}
+       }
+       const deps = Object.keys(preset.plugins) //获取各个插件的名称
+       deps.forEach((dep)=>{
+          let { version } = preset.plugins[dep]
+          if(!version){
+            version = 'latest'
+          }
+          pkg.devDependencies[dep] = 'latest';
+       })
+       //写入 package.json
+       await writeFileTree(context,{
+           'package.json':JSON.stringify(pkg,null,2)
+       })
    }
    resolvePreset(name){
         return this.getPresets()[name]
@@ -34,7 +59,7 @@ class Creator{
             preset = await this.resolvePreset(answers.preset)
         }else{
             preset = {
-                plugins:{}
+                plugins:{} //默认没有任何插件
             }
             answers.features = answers.features || []
             this.promptCompleteCbs.forEach(cb => cb(answers, preset)) //执行回调函数里面的方法 
@@ -42,7 +67,6 @@ class Creator{
             // { preset: '__manual__', features: [ 'vueVersion' ], vueVersion: '2' }  answers
             // { plugins: {}, vueVersion: '3' } ---preset
         }
-        console.log(preset,'---')
         return preset;
    }
    resolveFinalPrompts(){

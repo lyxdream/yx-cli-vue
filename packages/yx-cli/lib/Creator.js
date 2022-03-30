@@ -1,9 +1,11 @@
 
 const inquirer = require('inquirer');
+const cloneDeep = require('lodash.clonedeep')
 let {defaults} =  require('./options')
 let PromptModuleAPI = require('./PromptModuleAPI')
+const writeFileTree = require('./util/writeFileTree')
+let {chalk, execa} = require('yx-cli-shared-utils')
 const isManualMode = answers => answers.preset === '__manual__' //是否手动选择特性
-const cloneDeep = require('lodash.clonedeep')
 class Creator{
    constructor(name,context,promptModules){
         this.name = name;
@@ -13,8 +15,14 @@ class Creator{
         this.featurePrompt = featurePrompt; //目前是一个空数组
         this.injectedPrompts = []  //当前选择了某个特性后，这个特性刻印会总价新的选择项 unit 
         this.promptCompleteCbs = [] //当选择选项所有后的回调数组
+        this.run = this.run.bind(this);
         const promptAPI = new PromptModuleAPI(this)
         promptModules.forEach(m => m(promptAPI))  //调用vueVersion.js里面的函数
+   }
+   run(command,args){
+    //在context目录下执行命令
+    if (!args) { [command, ...args] = command.split(/\s+/) }
+    return execa(command,args,{cwd:this.context})
    }
    async create(){
        const {name,context} = this; //name 要创建的项目名 context所在目录
@@ -37,14 +45,39 @@ class Creator{
           if(!version){
             version = 'latest'
           }
-          pkg.devDependencies[dep] = 'latest';
+          pkg.devDependencies[dep] = version;
        })
        //写入 package.json
        await writeFileTree(context,{
            'package.json':JSON.stringify(pkg,null,2)
        })
    }
+   //初始化仓库
+   async initGit(){
+       const {run} = this;
+      log(`🗃  Initializing git repository...`)
+      await run('git init') //初始化git仓库
+      log(`⚙\u{fe0f}  Installing CLI plugins. This might take a while...`)
+      await run('npm Install') //安装依赖
+      log(`🚀  Invoking generators...`) //调用生成器
+      const plugins = await this.resolvePlugins(preset.plugins)
+   }
+   //解析插件
+   resolvePlugins(rawPlugins){
+    const plugins = [];
+    for(const id of Object.keys(rawPlugins)){
+        const apply  = loadModule(`${id}/generator`,this.context) //插件的generator导出的文件导出的函数
+        let options = rawPlugins[id] || {}
+        plugins.push({
+            id,
+            apply,
+            options
+        })
+    }
+    return plugins
+   }
    resolvePreset(name){
+       //如 default
         return this.getPresets()[name]
    }
    //弹出并解析预设

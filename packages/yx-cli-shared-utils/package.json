@@ -8,6 +8,6 @@
   "main": "lib/yx-cli-shared-utils.js",
   "dependencies": {
     "chalk": "4.1.2",
-    "execa": "^6.1.0"
+    "execa": "5.1.0"
   }
 }

@@ -4,7 +4,8 @@ const cloneDeep = require('lodash.clonedeep')
 let {defaults} =  require('./options')
 let PromptModuleAPI = require('./PromptModuleAPI')
 const writeFileTree = require('./util/writeFileTree')
-let {chalk, execa} = require('yx-cli-shared-utils')
+let {chalk, execa,loadModule} = require('yx-cli-shared-utils')
+let Generator = require('./Generator')
 const isManualMode = answers => answers.preset === '__manual__' //是否手动选择特性
 class Creator{
    constructor(name,context,promptModules){
@@ -25,44 +26,55 @@ class Creator{
     return execa(command,args,{cwd:this.context})
    }
    async create(){
-       const {name,context} = this; //name 要创建的项目名 context所在目录
+       const {name,context,run} = this; //name 要创建的项目名 context所在目录
        let preset = await this.promptAndResolvePreset()
-       console.log(preset,'---preset')
        preset = cloneDeep(preset)
        //@vue/cli-service  核心包，自带webpack得配置，build，serve的命令
        //@vue/cli-service  非常特殊，它的选项也被称为项目的选项，或者说根选项 rootOptions
        preset.plugins['@vue/cli-service'] = Object.assign({projectName:name},preset)
        console.log(`✨  Creating project in ${chalk.yellow(context)}.`)
-       const pkg = {  //将要生成的package.json内容
-           name,
-           version: '0.1.0',
-           private:true,
-           devDependencies: {}
-       }
-       const deps = Object.keys(preset.plugins) //获取各个插件的名称
-       deps.forEach((dep)=>{
-          let { version } = preset.plugins[dep]
-          if(!version){
+
+     // 写入 package.json
+        const pkg = {  //将要生成的package.json内容
+            name,
+            version: '0.1.0',
+            private:true,
+            devDependencies: {}
+        }
+        const deps = Object.keys(preset.plugins) //获取各个插件的名称
+        deps.forEach((dep)=>{
+        let { version } = preset.plugins[dep]
+        if(!version){
             version = 'latest'
-          }
-          pkg.devDependencies[dep] = version;
-       })
-       //写入 package.json
-       await writeFileTree(context,{
-           'package.json':JSON.stringify(pkg,null,2)
-       })
+        }
+        pkg.devDependencies[dep] = version;
+        })
+        //写入 package.json
+        await writeFileTree(context,{
+            'package.json':JSON.stringify(pkg,null,2)
+        })
+
+
+       // 安装插件
+       console.log(`🗃  Initializing git repository...`)
+       await run('git init') //初始化git仓库
+       console.log(`⚙\u{fe0f}  Installing CLI plugins. This might take a while...`)
+       await run('npm install') //安装插件
+
+        //调用生成器
+       console.log(`🚀  Invoking generators...`) 
+       const plugins = await this.resolvePlugins(preset.plugins)
+       console.log(plugins,'--plugins---plugins')
+
+       //run 生成器
+       const generator = new Generator(context, {pkg,plugins})
+       await generator.generate(); //生成代码
    }
-   //初始化仓库
-   async initGit(){
-       const {run} = this;
-      log(`🗃  Initializing git repository...`)
-      await run('git init') //初始化git仓库
-      log(`⚙\u{fe0f}  Installing CLI plugins. This might take a while...`)
-      await run('npm Install') //安装依赖
-      log(`🚀  Invoking generators...`) //调用生成器
-      const plugins = await this.resolvePlugins(preset.plugins)
+   //写入 package.json
+   async createPackageFile(){
+   
    }
-   //解析插件
+   //解析插件  [{ id, apply, options }]
    resolvePlugins(rawPlugins){
     const plugins = [];
     for(const id of Object.keys(rawPlugins)){
@@ -85,7 +97,7 @@ class Creator{
         if (!answers) {
             answers = await inquirer.prompt(this.resolveFinalPrompts())
         }   
-        console.log(answers,'answersanswers')
+        // console.log(answers,'answersanswers')
         let preset;
         if(answers.preset&&!isManualMode(answers)){
             //如果不是手动选择预设

@@ -334,3 +334,39 @@ create 的工作流程
 5. 安装额外的依赖
 6. 生成readme.md 文件
 
+
+
+实现插件机制
+```
+(1)preset = cloneDeep(preset) 这里的preset为：
+{ plugins: {}, vueVersion: '3' }
+
+ (2)preset.plugins['@vue/cli-service'] = Object.assign({projectName:name},preset)
+console.log(preset)
+{
+  plugins: <ref *1> {
+    '@vue/cli-service': { projectName: 'hello1', plugins: [Circular *1], vueVersion: '3' }
+  },
+  vueVersion: '3'
+}
+
+(3) preset.plugins
+ plugins: {
+    '@vue/cli-service': { projectName: 'hello1', plugins: [Circular *1], vueVersion: '3' }
+  },
+```
+（4）
+```js
+ const plugins = await this.resolvePlugins(preset.plugins)
+
+```
+打印的结果
+```
+[
+  {
+    id: '@vue/cli-service',
+    apply: [Function (anonymous)],
+    options: { projectName: 'hello1', plugins: [Object], vueVersion: '3' }
+  }
+]
+```

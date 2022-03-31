@@ -10,10 +10,10 @@
     "lyx-cli": "bin/vue.js"
   },
   "dependencies": {
-    "chalk": "^5.0.1",
+    "chalk": "4.1.2",
     "commander": "^9.1.0",
     "ejs": "^3.1.6",
-    "execa": "^6.1.0",
+    "execa": "5.1.0",
     "fs-extra": "^10.0.1",
     "globby": "^13.1.1",
     "inquirer": "^8.2.2",

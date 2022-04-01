@@ -330,7 +330,7 @@ create 的工作流程
 1. 创建项目  新建一个文件夹  mkdir hello-word
 2. git init
 3. 安装插件
-4. 调用生成器 generators  (每个插件都有一个生成器函数，调用它可以产出文件，或者修改配置)
+4. 调用生成器 generators  (每个插件都有一个生成器函数，调用它可以产出文件，或者修改配置package.json)
 5. 安装额外的依赖
 6. 生成readme.md 文件
 

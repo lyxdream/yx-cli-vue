@@ -29,6 +29,7 @@ class Creator{
        const {name,context,run} = this; //name 要创建的项目名 context所在目录
        let preset = await this.promptAndResolvePreset()
        preset = cloneDeep(preset)
+       console.log(preset,'==preset==')
        //@vue/cli-service  核心包，自带webpack得配置，build，serve的命令
        //@vue/cli-service  非常特殊，它的选项也被称为项目的选项，或者说根选项 rootOptions
        preset.plugins['@vue/cli-service'] = Object.assign({projectName:name},preset)

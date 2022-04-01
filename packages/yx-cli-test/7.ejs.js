@@ -21,7 +21,7 @@ console.log(source,'---')
         }else{
             const template = fs.readFileSync(sourcePath, 'utf8') //读取这个模版
             const content = ejs.render(template, {
-                rootOptions: { vueVersion: '2' }
+                rootOptions: { vueVersion: '3' }
             })
             files[sourcePath] = content;
         } 

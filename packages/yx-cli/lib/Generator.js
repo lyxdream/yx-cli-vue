@@ -1,6 +1,6 @@
 
 const {isPlugin} = require('yx-cli-shared-utils')
-const {GeneratorAPI} = require('./GeneratorAPI')
+const GeneratorAPI = require('./GeneratorAPI')
 class Generator{
   /**
    * @param {*} context 项目目录
@@ -18,11 +18,24 @@ class Generator{
     const cliService = this.plugins.find(p=>p.id==='@vue/cli-service')
     this.rootOptions = cliService.options; //cliService的配置对象就是preset,也就是根配置
   }
-  generate(){
+  async generate(){
     console.log('开始生成配置---')
-    await initPlugins();//初始化插件
+    await this.initPlugins();//初始化插件.修改fileMiddlewares和pkg
+    this.extractConfigFiles();//提取package.json的配置文件到单独的配置文件
+    await this.resolveFiles()
+    
   }
-  initPlugins(){
+  // 真正执行中间件
+  async resolveFiles(){
+    for(const middleware of this.fileMiddlewares){
+      await middleware(this.files,ejs.render)
+    }
+
+  }
+  extractConfigFiles(){
+    console.log('提取package.json的配置文件到单独的配置文件')
+  }
+  async initPlugins(){
     let {rootOptions} = this;
     for(const plugin of this.plugins){
       const {id,apply,options} = plugin;

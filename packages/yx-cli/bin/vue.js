@@ -11,7 +11,6 @@ program
 .command('create <app-name>')
 .description('create a new project powered by vue-cli-service')
 .action((appName)=>{
-    console.log(appName,'------')
     require('../lib/create')(appName)
 })
 

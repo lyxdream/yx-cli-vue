@@ -20,8 +20,8 @@ class GeneratorAPI{
     this.options = options;
     this.rootOptions = rootOptions;
     this.pluginsData = generator.plugins
-    .filter(id=>id!=='@vue/cli-service')
-    .map((id)=>({name:toShortPluginId(id)}))
+    .filter(({ id }) => id !== `@vue/cli-service`)
+    .map(({ id })=>({name:toShortPluginId(id)}))
     //@vue/cli-plugin-eslint=>eslint
   }
   _injectFileMiddleware(middleware){
@@ -34,6 +34,9 @@ class GeneratorAPI{
       plugins:this.pluginsData
     },addtionalData)
   }
+  hasPlugin (id) {
+    return this.generator.hasPlugin(id)
+  }
   /**
    * 
    * @param {*} source 模板目录的名称
@@ -43,6 +46,7 @@ class GeneratorAPI{
     const baseDir = extractCallDir(); //提取调用目录
     console.log(baseDir,'---baseDir')
     console.log(source,'--source---')
+    
     if(isString(source)){
       source = path.resolve(baseDir,source);
       //插入文件中间件 此处只是暂存中间件函数，并没有执行

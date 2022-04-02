@@ -70,6 +70,7 @@ class Creator{
        //run 生成器
        const generator = new Generator(context, {pkg,plugins})
        await generator.generate(); //生成代码
+       console.log('安装额外的依赖模块 npm install')    //安装额外的依赖模块 npm install
    }
    //写入 package.json
    async createPackageFile(){

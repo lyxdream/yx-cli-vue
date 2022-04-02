@@ -41,11 +41,22 @@
 
 
 
-[
-    'module',
-   'pluginResolution',
-].forEach(m => {
+// [
+//     'module',
+//    'pluginResolution',
+// ].forEach(m => {
  
-})
-console.log(exports,'----')
+// })
+// console.log(exports,'----')
 // Object.assign(exports, require(`./lib/pluginResolution`))
+
+
+
+ const res =[
+    {
+      id: '@vue/cli-service',
+      options: { projectName: 'hello7', plugins: [Object], vueVersion: '3' }
+    }
+  ].filter(({id})=>id!=='@vue/cli-service')
+
+  console.log(res)

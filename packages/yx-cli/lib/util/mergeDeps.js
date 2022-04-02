@@ -5,3 +5,4 @@ function mergeDeps(sourceDeps,depsToInject){
     }
     return result
 }
+module.exports = mergeDeps

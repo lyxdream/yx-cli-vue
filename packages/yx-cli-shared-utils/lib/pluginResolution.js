@@ -4,5 +4,6 @@ exports.isPlugin = (id)=>{ //@vue/cli-service
 }
 // @vue/cli-plugin-eslint=>eslint
 exports.toShortPluginId = (id)=>{ 
+  console.log(id,'-toShortPluginId--')
   return id.replace(pluginRE,'')
 }

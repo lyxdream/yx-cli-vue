@@ -370,3 +370,53 @@ console.log(preset)
   }
 ]
 ```
+```js
+function renderFile(name,data){
+  if(isBinaryFileSync(name)){
+    return fs.readFileSync(name)
+  }
+  console.log(name,'-----name,data--')
+  let template = fs.readFileSync(name,'utf8') //读取这个模版
+  return ejs.render(template,data)
+}
+```
+
+```
+开始生成配置---
+/Users/yinxia/Desktop/架构学习/yx-cli-vue/hello7/node_modules/@vue/cli-service/generator ---baseDir
+./template --source---
+```
+
+```
+提取package.json的配置文件到单独的配置文件
+_files [
+  '_gitignore',
+  'jsconfig.json',
+  'src/App.vue',
+  'src/main.js',
+  'public/favicon.ico',
+  'public/index.html',
+  'src/assets/logo.png',
+  'src/components/HelloWorld.vue'
+]
+```
+
+```
+Users/yinxia/Desktop/架构学习/yx-cli-vue/hello2/node_modules/@vue/cli-service/generator/template/src/assets/logo.png
+
+ {
+  options: {
+    projectName: 'hello7',
+    plugins: { '@vue/cli-service': [Circular] },
+    vueVersion: '3'
+  },
+  rootOptions: {
+    projectName: 'hello7',
+    plugins: { '@vue/cli-service': [Circular] },
+    vueVersion: '3'
+  },
+  plugins: [],
+  doesCompile: false,
+  useBabel: false
+} -----name,data--
+```

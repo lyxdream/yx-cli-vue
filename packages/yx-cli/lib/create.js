@@ -7,7 +7,6 @@ const Creator = require('./Creator')
  * @param {string} projectName  项目的名称
  */
 async function create(projectName){
-    debugger;
     let cwd = process.cwd();//获取当前的工作目录
     let name = projectName; //项目名称
     let targetDir = path.resolve(cwd,name)

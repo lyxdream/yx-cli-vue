@@ -70,13 +70,25 @@ class Creator{
        //run 生成器
        const generator = new Generator(context, {pkg,plugins})
        await generator.generate(); //生成代码
-       console.log('安装额外的依赖模块 npm install')    //安装额外的依赖模块 npm install
-   }
-   //写入 package.json
-   async createPackageFile(){
-   
+       console.log(`📦  Installing additional dependencies...`)    //安装额外的依赖模块 npm install
+       await run('npm install');
+
+       console.log('📄  Generating README.md...')
+       await writeFileTree(context, {
+        'README.md': `cd ${name}\n npm run serve`
+       })
+
+       await run('git', ['add', '-A'])
+       await run('git', ['commit', '-m', 'created', '--no-verify'])
+       console.log(`🎉  Successfully created project ${chalk.yellow(name)}.`)
+       console.log(
+        `👉  Get started with the following commands:\n\n` +
+        (chalk.cyan(`cd ${name}\n`)) +
+        (chalk.cyan(`npm run serve`))
+       )
    }
    //解析插件  [{ id, apply, options }]
+   //遍历插件的generator,插件通过GeneratorAPI向package.json中加入依赖或字段，并通过render准备添加文件
    resolvePlugins(rawPlugins){
     const plugins = [];
     for(const id of Object.keys(rawPlugins)){

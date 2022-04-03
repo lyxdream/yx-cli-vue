@@ -1,7 +1,7 @@
-const path = require('path');
-const globby = require('globby');
-const { fs } = require('fs');
+const fs = require('fs')
 const ejs = require('ejs')
+const path = require('path')
+const globby = require('globby');
 const { isBinaryFileSync } = require('isbinaryfile')
 let {toShortPluginId} = require('yx-cli-shared-utils');
 const mergeDeps = require('./util/mergeDeps')
@@ -27,12 +27,12 @@ class GeneratorAPI{
   _injectFileMiddleware(middleware){
     this.generator.fileMiddlewares.push(middleware)
   }
-  _resolveData(addtionalData){
+  _resolveData(additionalData){
     return Object.assign({
       options:this.options, //此插件对应得配置对象
       rootOptions:this.rootOptions,//根配置，preset
       plugins:this.pluginsData
-    },addtionalData)
+    },additionalData)
   }
   hasPlugin (id) {
     return this.generator.hasPlugin(id)
@@ -40,29 +40,31 @@ class GeneratorAPI{
   /**
    * 
    * @param {*} source 模板目录的名称
-   * @param {*} addtionalData 额外的数据对象
+   * @param {*} additionalData 额外的数据对象
    */
-  render(source,addtionalData){
-    const baseDir = extractCallDir(); //提取调用目录
+  render(source,additionalData = {}){
+    const baseDir = extractCallDir(); //提取调用目录      m m
     console.log(baseDir,'---baseDir')
     console.log(source,'--source---')
     
     if(isString(source)){
       source = path.resolve(baseDir,source);
       //插入文件中间件 此处只是暂存中间件函数，并没有执行
-      this._injectFileMiddleware(async function(files){
-        const data = this._resolveData(addtionalData)
+      this._injectFileMiddleware(async (files)=>{
+        console.log(files, '---files')
+        const data = this._resolveData(additionalData)
         const _files = await globby(['**/*'],{cwd:source});
         console.log('_files',_files)
         for(const rawPath of _files){
             const targetPath = rawPath.split('/').map(filename=>{
-                if(filename.charAt(0)=='_'){ //_gitignore=>.gitignore
-                    return `.${filename.slice(1)}`
+                if (filename.charAt(0) === '_' && filename.charAt(1) !== '_') {//_gitignore=>.gitignore
+                  return `.${filename.slice(1)}`
                 }
                 return filename
             }).join('/')
             //模板文件夹里原始文件得绝对路径
-            const sourcePath = path.resolve(source,targetPath) 
+            const sourcePath = path.resolve(source,rawPath) 
+            // /Users/yinxia/Desktop/架构学习/yx-cli-vue/hello7/node_modules/@vue/cli-service/generator/template/src/main.js
             const content = renderFile(sourcePath,data) //内容
             //不管是二进制文件还是普通得文本都暂存到files对象上去
             files[targetPath] = content
@@ -85,6 +87,7 @@ class GeneratorAPI{
   }
 }
 function renderFile(name,data){
+  console.log(name,'-----name,data--')
   if(isBinaryFileSync(name)){
     return fs.readFileSync(name)
   }

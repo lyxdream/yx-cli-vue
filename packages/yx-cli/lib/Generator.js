@@ -29,7 +29,8 @@ class Generator{
     await this.resolveFiles()  //wait for file resolve
     this.sortPkg() //对依赖包进行排序，重写package.json
     this.files['package.json'] = JSON.stringify(this.pkg, null, 2) + '\n'
-    await writeFileTree(this.context,this.files) //write/update file tree to disk
+     //把内存中的文件写入硬盘
+    await writeFileTree(this.context,this.files) 
 
     
   }
@@ -44,10 +45,11 @@ class Generator{
   }
   // 真正执行中间件
   async resolveFiles(){
+    const files = this.files
     for(const middleware of this.fileMiddlewares){
-      await middleware(this.files,ejs.render)     //执行fileMiddlewares里面的函数
+      await middleware(files,ejs.render)     //执行fileMiddlewares里面的函数
     }
-    // 把 /替换为 \
+    // 把 \替换为 /
     normalizeFilePaths(files)
   }
   extractConfigFiles(){

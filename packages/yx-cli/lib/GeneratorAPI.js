@@ -44,14 +44,10 @@ class GeneratorAPI{
    */
   render(source,additionalData = {}){
     const baseDir = extractCallDir(); //提取调用目录      m m
-    console.log(baseDir,'---baseDir')
-    console.log(source,'--source---')
-    
     if(isString(source)){
       source = path.resolve(baseDir,source);
       //插入文件中间件 此处只是暂存中间件函数，并没有执行
       this._injectFileMiddleware(async (files)=>{
-        console.log(files, '---files')
         const data = this._resolveData(additionalData)
         const _files = await globby(['**/*'],{cwd:source});
         console.log('_files',_files)
@@ -87,7 +83,6 @@ class GeneratorAPI{
   }
 }
 function renderFile(name,data){
-  console.log(name,'-----name,data--')
   if(isBinaryFileSync(name)){
     return fs.readFileSync(name)
   }

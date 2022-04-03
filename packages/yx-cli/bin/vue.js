@@ -10,8 +10,10 @@ program
 program
 .command('create <app-name>')
 .description('create a new project powered by vue-cli-service')
-.action((appName)=>{
-    require('../lib/create')(appName)
+.option('--merge', 'Merge target directory if it exists')
+.option('-f, --force', 'Overwrite target directory if it exists')
+.action((name,cmd)=>{
+    require('../lib/create')(name,cmd)
 })
 
 program.parse(process.argv)

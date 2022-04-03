@@ -86,6 +86,7 @@ class Creator{
         (chalk.cyan(`cd ${name}\n`)) +
         (chalk.cyan(`npm run serve`))
        )
+       generator.printExitLogs()
    }
    //解析插件  [{ id, apply, options }]
    //遍历插件的generator,插件通过GeneratorAPI向package.json中加入依赖或字段，并通过render准备添加文件

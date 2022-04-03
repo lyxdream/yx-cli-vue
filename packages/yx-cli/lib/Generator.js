@@ -63,6 +63,9 @@ class Generator{
       await apply(api,options,rootOptions)
     }
   }
+  printExitLogs(){
+    console.log('printExitLogs');
+  }
 }
 
 module.exports = Generator

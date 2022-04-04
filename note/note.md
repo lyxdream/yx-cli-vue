@@ -1,4 +1,25 @@
 
+# 实现一个简易的vue-cli4脚手架
+
+##  1.准备工作
+
+项目实战中遇到的问题：维护多个仓库的公共代码是一件头疼的事情，每次对公共代码的改动都要全量仓库同步，最后决定用 monorepo 改造一番。
+
+### 1.1 monorepo
+
+- monoRepo： 是将所有的模块统一的放在一个主干分支之中管理。(指在一个项目仓库 (repo) 中管理多个模块/包 (package))
+- multiRepo： 将项目分化成为多个模块，并针对每一个模块单独的开辟一个Repo来进行管理。
+
+### 1.2 Lerna
+
+> Lerna是一个管理多个 npm 模块的工具,优化维护多包的工作流，解决多个包互相依赖，且发布需要手动维护多个包的问题
+
+### lerna vs yarn
+两者很多功能是等价的
+yarn用来处理依赖，lerna用于初始化和发布
+
+### 1.3 必备模块
+
 1. commander.js
 commander 是一款强大的命令行框架，提供了用户命令行输入和参数解析功能
 
@@ -226,11 +247,11 @@ setTimeout(()=>{
 
 7. ejs
 
-ejs是高效的嵌入式 JavaScript 模板引擎
-slash将Windows反斜杠路径转换为斜杠路径，如foo\\bar➔ foo/bar
-globby是用于模式匹配目录文件的
+- ejs是高效的嵌入式 JavaScript 模板引擎
+- slash将Windows反斜杠路径转换为斜杠路径，如foo\\bar➔ foo/bar
+- globby是用于模式匹配目录文件的
 
-##### 7.1 main.js
+#### 7.1 main.js
 template/main.js
 
 ```js
@@ -247,7 +268,7 @@ template/main.js
     }).$mount('#app')
   <%} %>
 ```
-##### 7.2 HelloWord.vue
+#### 7.2 HelloWord.vue
 
 template/components/HelloWord.vue
 
@@ -262,7 +283,7 @@ export default {
 }
 </script>
 ```
-##### 7.3 ejs.js 
+#### 7.3 ejs.js 
 
 yx-cli-test/7.ejs.js 
 
@@ -325,7 +346,7 @@ console.log(source,'---')
 }
 ```
 
-create 的工作流程
+### 1.4 create 的工作流程
 
 1. 创建项目  新建一个文件夹  mkdir hello-word
 2. git init
@@ -334,9 +355,384 @@ create 的工作流程
 5. 安装额外的依赖
 6. 生成readme.md 文件
 
+![create](./img/1.png)
 
 
-实现插件机制
+
+## 2.工程创建
+
+### 2.1 安装
+
+```bash
+npm i lerna -g
+```
+
+### 2.2 初始化
+
+```
+lerna init
+```
+### 2.3 配置文件
+
+package.json
+
+```json
+{
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  }
+}
+```
+
+lerna.json 
+```json
+{
+  "packages": [
+    "packages/*"
+  ],
+  "version": "0.0.0"
+}
+```
+
+
+.gitignore 
+
+```
+node_modules
+.DS_Store
+design
+*.log
+packages/test
+dist
+temp
+.vuerc
+.version
+.versions
+.changelog
+```
+
+
+### 2.4 yarn workspace
+
+- yarn workspace允许我们使用 monorepo 的形式来管理项目
+- 在安装 node_modules 的时候它不会安装到每个子项目的 node_modules 里面，而是直接安装到根目录下面，这样每个子项目都可以读取到根目录的 node_modules
+- 整个项目只有根目录下面会有一份 yarn.lock 文件。子项目也会被 link 到 node_modules 里面，这样就允许我们就可以直接用 import 导入对应的项目
+- yarn.lock文件是自动生成的,也完全Yarn来处理.yarn.lock锁定你安装的每个依赖项的版本，这可以确保你不会意外获得不良依赖
+
+package.json
+
+```json
+{
+  "name": "root",
+  "private": true,
+  "workspaces":[
+    "packages/*"
+  ]
+}
+
+```
+lerna.json
+
+```json
+{
+  "packages": [
+    "packages/*"
+  ],
+  "useWorkspaces":true,
+  "npmClient":"yarn",
+  "version": "0.0.0"
+}
+
+```
+
+### 2.5 创建子项目
+
+```bash
+lerna create yx-cli
+lerna create  yx-cli-shared-utils
+lerna create  yx-cli-test
+
+yarn
+
+```
+
+#### 2.5.1 yx-cli 
+
+packages\yx-cli\package.json
+
+
+package.json 
+
+```json
+{
+  "name": "yx-cli",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "lyxdream <2937213246@qq.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/yx-cli.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  }
+}
+
+```
+packages\yx-cli\bin\vue.js
+vue.js
+
+```js
+#!/usr/bin/env node
+#! /usr/local/bin/node 
+
+let {a}= require('yx-cli-shared-utils')
+console.log(a)  //yx
+```
+
+##### 2.5.2 yx-cli-shared-utils 
+
+packages\yx-cli-shared-utils\package.json
+package.json
+```json
+{
+  "name": "yx-cli-shared-utils",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "lyxdream <2937213246@qq.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/yx-cli-shared-utils.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  }
+}
+
+```
+packages\yx-cli-shared-utils\index.js
+index.js 
+
+```js
+exports.a = 'yx'
+
+```
+
+### 2.6 create命令
+
+package.json
+
+```json
+{
+  "name": "root",
+  "private": true,
+  "scripts": {
+    "create":"node packages/yx-cli/bin/vue.js create hello"
+  },
+  "workspaces":[
+    "packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  }
+}
+
+```
+执行命令
+
+==**==npm== run create**==
+
+```
+> root@ create /Users/yinxia/Desktop/架构学习/yx-cli-vue
+> node packages/yx-cli/bin/vue.js create hello
+
+yx
+```
+
+### 2.7 创建软链接 
+
+
+
+packages\yx-cli\package.json
+
+>  "bin":{
+>     "yx-cli":"bin/vue.js"
+>   }
+
+```json
+{
+  "name": "yx-cli",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "lyxdream <2937213246@qq.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/yx-cli.js",
+  "bin":{
+    "yx-cli":"bin/vue.js"
+  }
+}
+```
+```bash 
+yarn
+cd packages/yx-cli
+npm link  //链接到全局
+npm root -g 
+///usr/local/lib/node_modules
+lyx-cli
+```
+
+### 2.8 安装依赖
+
+```
+npm config set registry=https://registry.npm.taobao.org
+yarn config set registry https://registry.npm.taobao.org
+
+```
+
+```
+cd packages/yx-cli-shared-utils
+
+yarn workspace yx-cli-shared-utils add  chalk execa
+//选择一个工作空间 xx 添加两个包chalk execa
+
+cd packages/yx-cli
+
+yarn workspace yx-cli add  yx-cli-shared-utils commander inquirer execa chalk ejs globby  lodash.clonedeep fs-extra ora isbinaryfile 
+
+```
+
+yx-cli的package.json增加
+
+```
+"yx-cli-shared-utils":"^0.0.0"
+```
+
+可以通过 lerna add [内部还没发布的包] --scope=[安装到指定的包]
+
+
+
+## 3. 实现create 命令
+
+### 3.1 参数解析
+
+#### 3.1.1 vue.js
+
+packages\yx-cli\bin\vue.js
+
+```js
+#!/usr/bin/env node
+
+const program = require('commander');
+
+program
+.version(`yx-cli ${require('../package').version}`)
+.usage('<command> [options]')
+
+
+program
+.command('create <app-name>')
+.description('create a new project powered by vue-cli-service')
+.option('--merge', 'Merge target directory if it exists')
+.option('-f, --force', 'Overwrite target directory if it exists')
+.action((name,cmd)=>{
+    require('../lib/create')(name,cmd)
+})
+
+program.parse(process.argv)
+
+```
+
+#### 3.1.2 create.js
+
+packages\yx-cli\lib\create.js
+
+```js
+
+const path = require('path')
+const fs = require('fs')
+const inquirer = require('inquirer');
+let {chalk} = require('yx-cli-shared-utils')
+/**
+ * @description 创建项目
+ * @param {string} projectName  项目的名称
+ */
+async function create(projectName,options){
+    let cwd = process.cwd();//获取当前的工作目录
+    let name = projectName; //项目名称
+    let targetDir = path.resolve(cwd,name)
+    console.log(name,targetDir) 
+    // 检测目录是否存在
+    if (fs.existsSync(targetDir)&& !options.merge) {
+        if (options.force) {
+          //是否是强制创建，删除已有的
+          await fs.remove(targetDir);
+        } else {
+          //提示用户是否确定要覆盖  配置询问的方式
+          const { action } = await inquirer.prompt([
+            {
+              name: "action", //选择的结果
+              type: "list", //展示方式
+              message: `Target directory already exists Pick an action`,
+              choices: [
+                { name: "Overwrite", value: "overwrite" },
+                { name: 'Merge', value: 'merge' },
+                { name: "Cancel", value: false },
+              ],
+            },
+          ]);
+          if (!action) {
+            return;
+          } else if (action === "overwrite") {
+            console.log(`\nRemoving ${chalk.cyan(targetDir)}...`)
+            await fs.remove(targetDir);
+          }
+        }
+      }
+
+}
+
+module.exports = (...args)=>{
+    return create(...args).catch(err=>{
+        console.log(err)
+    })
+}
+
+```
+### 3.2获取预设
+### 3.3 写入package.json
+### 3.4 安装依赖
+### 3.5 实现插件机制
+![实现插件机制](/note/img/8.png)
+### 3.6 完成create命令
+
+
+最后实现的效果如下：
+
+![命令行](/note/img/7.png)
+
+![生成的文件](/note/img/9.png)
+
+![运行项目](/note/img/10.png)
+
+![运行结果](/note/img/11.png)
+
+
+**Tip:记录一下实现插件机制的一些流程，方便理解**
 ```
 (1)preset = cloneDeep(preset) 这里的preset为：
 { plugins: {}, vueVersion: '3' }

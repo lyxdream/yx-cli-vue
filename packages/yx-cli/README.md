@@ -1,11 +1,8 @@
-# `yx-cli`
+# yx-cli
 
-> TODO: description
+> 实现create命令
 
-## Usage
-
+``` sh
+lyx-cli create my-project
 ```
-const yxCli = require('yx-cli');
 
-// TODO: DEMONSTRATE API
-```

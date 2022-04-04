@@ -1,6 +1,7 @@
 # 实现一个简易的vue-cli4脚手架
 
 ## 目录结构
+```
 .
 ├── README.md
 ├── lerna.json
@@ -54,10 +55,12 @@
 │           └── main.js
 └── yarn.lock
 
+```
+
+
 ## 实现的核心功能
 
-
-
+![create](/note/img/1.png)
 
 ## 如何开发项目
 
@@ -99,13 +102,19 @@ Commands:
 lyx-cli create <app-name>或npm run create <app-name>
 ```
 
-
 你会被提示选取一个 preset。你可以选默认的包含了基本的 Babel + ESLint 设置的 preset，也可以选“手动选择特性”来选取需要的特性。
+![create](/note/img/2.png)
+
 
 如果选择了Manually select features会有一个选择feature提示：Choose Vue version
+![create](/note/img/3.png)
 
+![create](/note/img/4.png)
 
 选择2.x或者3.x之后，会看到以下提示
+
+![create](/note/img/5.png)
+![create](/note/img/6.png)
 
 运行
 ```
@@ -114,8 +123,16 @@ npm run serve
 ```
 
 
+最后实现的效果如下：
+
+![命令行](/note/img/7.png)
+
+![生成的文件](/note/img/9.png)
 
 
+![运行项目](/note/img/10.png)
+
+![运行结果](/note/img/11.png)
 
 
 

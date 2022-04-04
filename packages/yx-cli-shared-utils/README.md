@@ -1,11 +1,4 @@
-# `yx-cli-shared-utils`
+# yx-cli-shared-utils
 
-> TODO: description
+> shared-utils for yx-cli
 
-## Usage
-
-```
-const yxCliSharedUtils = require('yx-cli-shared-utils');
-
-// TODO: DEMONSTRATE API
-```
